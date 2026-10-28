@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tide Lab: TEKS 6.9B Virtual Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#EAF4F5; --panel:#FFFFFF; --panel2:#F3F9FA; --ink:#0C2B3A; --muted:#48646F; --line:#C5D9DE;
+  --accent:#0B6F73; --accent-ink:#FFFFFF; --accent-soft:#D3EDED;
+  --good:#17703F; --good-soft:#DDF3E6; --bad:#B3321F; --bad-soft:#FBE4DF; --note-soft:#FFF1CC;
+  --space:#0B2233; --space-ink:#E8F1F5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#08171F; --panel:#10293A; --panel2:#0D2231; --ink:#E6F1F5; --muted:#9DB6C2; --line:#244558;
+    --accent:#35C0C4; --accent-ink:#06222A; --accent-soft:#123C46;
+    --good:#58D08C; --good-soft:#12382A; --bad:#FF8E7C; --bad-soft:#40201C; --note-soft:#3A3217;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#08171F; --panel:#10293A; --panel2:#0D2231; --ink:#E6F1F5; --muted:#9DB6C2; --line:#244558;
+  --accent:#35C0C4; --accent-ink:#06222A; --accent-soft:#123C46;
+  --good:#58D08C; --good-soft:#12382A; --bad:#FF8E7C; --bad-soft:#40201C; --note-soft:#3A3217;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Lexend",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding:0 18px}
+.skip{position:absolute;left:-999px}
+.skip:focus{left:12px;top:12px;background:var(--panel);padding:8px 12px;z-index:50}
+h1,h2,h3{line-height:1.2;margin:0}
+h1{font-size:1.6rem;font-weight:700}
+h2{font-size:1.5rem;font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:.5em 0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.top{background:var(--space);color:var(--space-ink);padding:16px 0 0}
+.top .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand p{margin:0;color:#A9C4D1;font-size:.9rem}
+.reset{background:transparent;border:1px solid #4C7184;color:var(--space-ink);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.reset:hover{background:#163A50}
+.steps{display:flex;gap:6px;overflow-x:auto;padding:14px 18px 0;max-width:1120px;margin:0 auto;scrollbar-width:thin}
+.chip{flex:1 0 auto;min-width:112px;background:#12344A;color:var(--space-ink);border:0;border-radius:10px 10px 0 0;padding:10px 12px 12px;text-align:left;cursor:pointer;font-size:.88rem;line-height:1.25;position:relative}
+.chip small{display:block;color:#A9C4D1;font-size:.75rem}
+.chip[aria-current="step"]{background:var(--bg);color:var(--ink)}
+.chip[aria-current="step"] small{color:var(--muted)}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip.done::after{content:"\2713";position:absolute;right:10px;top:8px;color:#6BE3A0;font-weight:700}
+.chip[aria-current="step"].done::after{color:var(--good)}
+.water{height:6px;background:#12344A}
+.water i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2B7FD1,#35C0C4);transition:width .4s}
+
+main{padding:22px 0 30px;outline:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:0 0 18px}
+.mhead{margin:0 0 16px}
+.goal{font-size:1.05rem;max-width:68ch;margin:.5em 0}
+.mins{color:var(--muted);font-size:.9rem;margin:0}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:880px){.two{grid-template-columns:1fr}}
+.sim svg,.fig svg{display:block;width:100%;height:auto;border-radius:12px}
+.chart svg{display:block;width:100%;height:auto}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 0}
+.ctl label{font-weight:500}
+.ctl input[type=range]{flex:1 1 200px;min-width:140px;accent-color:var(--accent);height:28px}
+.ctl output{font-weight:600;min-width:7.5ch}
+.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--accent)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;min-height:44px}
+.btn:hover{filter:brightness(1.08)}
+.btn.alt{background:var(--accent-soft);color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 0}
+.read div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.read span{display:block;color:var(--muted);font-size:.8rem}
+.read b{font-size:1.02rem;font-weight:600}
+ol.how{margin:.4em 0 0;padding-left:1.3em}
+ol.how li{margin:.45em 0;max-width:62ch}
+table.data{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px}
+table.data th,table.data td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left}
+table.data th{font-weight:600;color:var(--muted);font-size:.82rem}
+.empty{color:var(--muted);font-size:.92rem;margin:8px 0}
+.mark-ok{color:var(--good);font-weight:600}
+.mark-no{color:var(--bad);font-weight:600}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.jump .btn{padding:6px 12px;min-height:38px;font-size:.9rem}
+.nameit{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:10px 0 0;padding:10px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.nameit label{display:flex;align-items:center;gap:6px}
+.todo{list-style:none;margin:10px 0 0;padding:0;font-size:.92rem}
+.todo li{padding-left:1.6em;position:relative;margin:3px 0;color:var(--muted)}
+.todo li::before{content:"\25CB";position:absolute;left:0}
+.todo li.ok{color:var(--good)}
+.todo li.ok::before{content:"\2713";font-weight:700}
+
+fieldset.q{border:1px solid var(--line);border-radius:12px;padding:14px 16px 16px;margin:0 0 14px;background:var(--panel)}
+fieldset.q legend{padding:0 6px;font-weight:600;max-width:70ch}
+.qn{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:999px;min-width:1.6em;text-align:center;margin-right:6px;font-size:.85rem;padding:0 6px}
+.opts{display:grid;gap:8px;margin:10px 0}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--panel2);max-width:70ch}
+.opt input{margin-top:.3em;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong,.opt.miss{border-color:var(--bad);background:var(--bad-soft);opacity:.8}
+.fb{margin-top:8px;padding:0;max-width:70ch}
+.fb.good,.fb.bad,.fb.info{padding:10px 12px;border-radius:10px}
+.fb.good{background:var(--good-soft)}
+.fb.bad{background:var(--bad-soft)}
+.fb.info{background:var(--note-soft)}
+.fig{max-width:420px;margin:10px 0}
+.numrow{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0}
+.numrow label{display:flex;gap:8px;align-items:center}
+.numrow input{width:6.5em;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+textarea.cer{width:100%;min-height:150px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2);line-height:1.5;resize:vertical}
+.nameit input[type=text]{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:200px}
+dl.vocab{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:8px 0 0;max-width:72ch}
+dl.vocab dt{font-weight:600}
+dl.vocab dd{margin:0}
+@media (max-width:560px){dl.vocab{grid-template-columns:1fr}}
+.std{border-left:4px solid var(--accent);padding:6px 14px;margin:10px 0;background:var(--panel2);max-width:72ch}
+.note{background:var(--note-soft);border-radius:10px;padding:10px 14px;max-width:72ch;font-size:.95rem}
+
+.navbar{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));z-index:5}
+.navbar .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between}
+.gatemsg{flex:1;color:var(--muted);font-size:.9rem;text-align:center}
+.gatemsg.ready{color:var(--good);font-weight:600}
+
+.report h2{margin-bottom:6px}
+.report table{margin-bottom:10px}
+.rbtns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+@media print{
+  body{background:#fff;color:#000;font-size:12pt}
+  .top,.navbar,.skip,.rbtns,.chip{display:none!important}
+  .panel{border:1px solid #999;break-inside:avoid;background:#fff}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#stage">Skip to the lab</a>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#12344A"/><path d="M4 26c4-6 7-6 11 0s7 6 11 0 7-6 14 0" fill="none" stroke="#35C0C4" stroke-width="3" stroke-linecap="round"/><circle cx="31" cy="12" r="5" fill="#EDE6BE"/></svg>
+      <div><h1>Tide Lab</h1><p>TEKS 6.9B · Grade 6 science · about 60 minutes</p></div>
+    </div>
+    <button class="reset" id="reset" type="button">Start over</button>
+  </div>
+  <nav class="steps" id="steps" aria-label="Lab progress"></nav>
+  <div class="water" aria-hidden="true"><i id="fill"></i></div>
+</header>
+
+<main id="stage" class="wrap" tabindex="-1"></main>
+
+<div class="navbar">
+  <div class="wrap">
+    <button class="btn alt" id="back" type="button">Back</button>
+    <div class="gatemsg" id="gate" role="status"></div>
+    <button class="btn" id="next" type="button">Next</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s);};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var clamp=function(v,a,b){return Math.max(a,Math.min(b,v));};
+var rad=function(d){return d*Math.PI/180;};
+var deg=function(r){return r*180/Math.PI;};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function fmtTime(h){var tot=Math.round(h*60)%1440;var hh=Math.floor(tot/60),mm=tot%60;var ap=hh<12?'AM':'PM';var h12=hh%12===0?12:hh%12;return h12+':'+String(mm).padStart(2,'0')+' '+ap;}
+function dayTime(t){return 'Day '+Math.floor(t/24)+', '+fmtTime(t%24);}
+
+var C={space:'#0B2233',ink:'#E8F1F5',sea:'#2B7FD1',land:'#3F8A5B',land2:'#79B67F',moon:'#EDE6BE',moonDark:'#33495A',sun:'#F6B02E',pin:'#FFD23F',line:'#8FB0C0'};
+
+function stars(n,w,h,seed){var s=seed||7,out='';var r=function(){s=(s*16807)%2147483647;return s/2147483647;};
+  for(var i=0;i<n;i++){out+='<circle cx="'+(r()*w).toFixed(0)+'" cy="'+(r()*h).toFixed(0)+'" r="'+(0.6+r()*1.1).toFixed(1)+'" fill="#fff" opacity="'+(0.25+r()*0.5).toFixed(2)+'"/>';}
+  return out;}
+
+var BLOBS='<path d="M-34 -36 q22 -22 48 -8 q20 16 4 36 q-20 14 -42 4 q-18 -14 -10 -32z"/><path d="M18 26 q16 -8 28 4 q8 14 -6 22 q-18 4 -26 -8 q-4 -10 4 -18z"/><path d="M-52 18 q10 -12 24 -4 q8 12 -4 22 q-14 4 -20 -6z"/>';
+
+function moonG(mx,my,r,sx,sy){var a=deg(Math.atan2(sy-my,sx-mx))-180;
+  return '<g transform="translate('+mx.toFixed(1)+' '+my.toFixed(1)+') rotate('+a.toFixed(1)+')"><circle r="'+r+'" fill="'+C.moonDark+'"/><path d="M0 '+(-r)+' A'+r+' '+r+' 0 0 0 0 '+r+' Z" fill="'+C.moon+'"/></g>';}
+
+/* ---------- state ---------- */
+var STEPS=[
+  {id:'start',title:'Start',sub:'5 min'},
+  {id:'m1',title:'Mission 1',sub:'Daily tides · 12 min'},
+  {id:'m2',title:'Mission 2',sub:'Spring and neap · 15 min'},
+  {id:'m3',title:'Mission 3',sub:'Tide chart · 10 min'},
+  {id:'m4',title:'Mission 4',sub:'Predict it · 10 min'},
+  {id:'check',title:'Exit check',sub:'8 min'},
+  {id:'report',title:'Lab report',sub:'turn in'}
+];
+function freshState(){return {step:0,name:'',period:'',qs:{},m1:{hour:0,rows:[],arrows:false},m2:{day:0,rows:[],pulls:true,mine:''},m3:{t:0,n1:'',n2:''},cer:'',cerChecks:[false,false,false,false]};}
+var S=freshState();
+var loaded=false;
+try{var raw=sessionStorage.getItem('tidelab-6-9b');if(raw){var p=JSON.parse(raw);if(p&&p.qs){S=Object.assign(freshState(),p);loaded=true;}}}catch(e){}
+function save(){try{sessionStorage.setItem('tidelab-6-9b',JSON.stringify(S));}catch(e){}}
+
+/* ---------- questions ---------- */
+var TIDE_OPTS=['Spring tide, because the Sun, Earth, and Moon are in a line','Neap tide, because the Sun, Earth, and Moon are in a line','Spring tide, because the Sun, Earth, and Moon form a right angle','Neap tide, because the Sun, Earth, and Moon form a right angle'];
+var WHY_SPRING='The Sun, Earth, and Moon are in a straight line, so the Sun’s and Moon’s pulls add together. That makes a spring tide, with the biggest difference between high and low tide.';
+var WHY_NEAP='The Sun, Earth, and Moon make a right angle, so the Sun and Moon pull the ocean in different directions. That makes a neap tide, with the smallest difference between high and low tide.';
+var Q={
+  pre1:{step:'start',pred:true,fixed:true,text:'Before you start, how many high tides do you think a beach has in one day?',opts:['1','2','3','4']},
+  pre2:{step:'start',pred:true,text:'What do you think is the main cause of ocean tides?',opts:['Wind blowing across the ocean','Gravity from the Moon and Sun','Earth’s tilt','Ocean currents']},
+
+  m1a:{step:'m1',fixed:true,text:'In your model, how many high tides did the beach have in 24 hours?',opts:['1','2','3','4'],ans:1,
+    why:'Two. The beach passed through the bulge facing the Moon and then the bulge on the far side, once each, as Earth turned.',
+    hint:'Press Play for the full 24 hours and count how many times the gauge reaches its highest level.'},
+  m1b:{step:'m1',text:'The Moon pulls hardest on the water on the side of Earth that faces it. Why is there also a high tide on the opposite side of Earth?',
+    opts:['The Moon pulls the far-side water less than it pulls the rest of Earth, so that water is left behind and bulges out.','The Sun pulls on the far side of Earth every day.','Waves from the near side wash across the ocean.','Earth’s tilt pushes the water up on that side.'],ans:0,
+    why:'Gravity is weaker on the far side, so the far-side water is pulled less than Earth itself. It gets left behind and forms a second bulge.',
+    hint:'Turn on Show gravity pulls. Which side gets the shortest arrow?'},
+  m1c:{step:'m1',text:'What carries the beach from a high tide to a low tide in your model?',
+    opts:['Earth rotates, so the beach moves out of a bulge','The Moon moves closer to the beach','Wind blows the water away','The Sun’s gravity turns off at night'],ans:0,
+    why:'Earth spins once about every 24 hours. The bulges stay lined up with the Moon, so the beach rides from a bulge to a low spot and back to a bulge.',
+    hint:'Watch the yellow dot as you drag the time slider. What is moving, the ocean bulges or the beach?'},
+
+  m2a:{step:'m2',text:'When the Sun, Moon, and Earth line up in a straight line, what happens to the tides?',
+    opts:['High tides get higher and low tides get lower. This is a spring tide.','The tides get smaller. This is a neap tide.','The tides stop for a day.','Only the waves change.'],ans:0,
+    why:'The Sun’s and Moon’s pulls add together, so the tidal range (the difference between high and low tide) gets bigger.',
+    hint:'Jump to New moon in the sim and read the tidal range.'},
+  m2b:{step:'m2',text:'When the Moon is at a right angle to the Sun (first or third quarter), what happens to the tides?',
+    opts:['The Sun and Moon pull the ocean in different directions, so the tidal range is smaller. This is a neap tide.','Their pulls add together, so the tides are the biggest of the month.','Their pulls cancel completely, so there are no tides.','Gravity from the Moon is turned off.'],ans:0,
+    why:'The pulls work against each other’s bulges. The Moon still wins because it is closer, so tides do not disappear. The tidal range just gets smaller.',
+    hint:'Jump to First quarter and compare the tidal range with New moon.'},
+  m2c:{step:'m2',text:'At a full moon, Earth is between the Sun and the Moon. Why does a full moon still cause a spring tide?',
+    opts:['The Sun, Earth, and Moon are still in a line, so the two bulges line up and get bigger.','A full moon is brighter, so it pulls harder.','The Moon is closer to Earth at full moon.','A full moon always causes neap tides.'],ans:0,
+    why:'It does not matter which side of Earth the Moon is on. When all three are in a line, the Sun’s and Moon’s pulls work together. Spring tides happen at both new moon and full moon.',
+    hint:'Jump to Full moon and look at the shape of the ocean and the tidal range.'},
+
+  m3a:{step:'m3',fixed:true,text:'Look at any one day on the chart (24 hours). About how many high tides does this beach have?',opts:['1','2','3','4'],ans:1,
+    why:'Two. The chart shows two peaks and two valleys each day, just like your Mission 1 model.',hint:'Count the peaks between two day lines.'},
+  m3b:{step:'m3',type:'chart'},
+  m3c:{step:'m3',fixed:true,text:'About how many days go by between the biggest tides (spring) and the smallest tides (neap) on the chart?',opts:['1 day','3 days','7 days','30 days'],ans:2,
+    why:'The chart goes from the biggest tides on Day 0 to the smallest tides around Day 7, about one week. That is a quarter of the Moon’s 29.5-day cycle.',
+    hint:'Find where the peaks are tallest and where they are shortest. How many day lines apart are they?'},
+  m3d:{step:'m3',fixed:true,text:'High tide is at 6:00 AM today. When will the next high tide be?',opts:['About 12:00 noon','About 6:30 PM','About 11:00 PM','Exactly 6:00 PM'],ans:1,
+    why:'High tides are about 12 hours and 25 minutes apart, so the next one is around 6:25 PM. It is not exactly 12 hours because the Moon keeps moving along its orbit while Earth spins.',
+    hint:'Use what you saw in the chart: two high tides per day, a little more than 12 hours apart.'},
+  m3e:{step:'m3',fixed:true,text:'High tide is at 6:00 AM today. About when is the first high tide tomorrow morning?',opts:['About 5:10 AM','Exactly 6:00 AM','About 6:50 AM','About 8:30 AM'],ans:2,
+    why:'Tides follow the Moon. The Moon comes back overhead about 50 minutes later each day, so tides arrive about 50 minutes later each day.',
+    hint:'Each day, Earth has to spin a little extra to catch up with the Moon as it moves along its orbit.'},
+
+  m4a:{step:'m4',fig:{type:'tri',delta:0,label:'The Moon is between Earth and the Sun.'},text:'Scenario 1: The Moon is between Earth and the Sun. What kind of tide will Earth have, and why?',opts:TIDE_OPTS,ans:0,why:WHY_SPRING,hint:'Think about the shape the three objects make. Is it a line or an L?'},
+  m4b:{step:'m4',fig:{type:'tri',delta:90,label:'The Moon makes an L-shape with the Sun and Earth.'},text:'Scenario 2: The Moon is a quarter of the way around its orbit. What kind of tide will Earth have, and why?',opts:TIDE_OPTS,ans:3,why:WHY_NEAP,hint:'Think about the shape the three objects make. Is it a line or an L?'},
+  m4c:{step:'m4',fig:{type:'tri',delta:180,label:'Earth is between the Sun and the Moon.'},text:'Scenario 3: Earth is between the Sun and the Moon. What kind of tide will Earth have, and why?',opts:TIDE_OPTS,ans:0,why:WHY_SPRING,hint:'Remember Mission 2. The Moon can be on either side of Earth.'},
+  m4d:{step:'m4',fig:{type:'tri',delta:270,label:'The Moon is three quarters of the way around its orbit.'},text:'Scenario 4: The Moon is three quarters of the way around its orbit. What kind of tide will Earth have, and why?',opts:TIDE_OPTS,ans:3,why:WHY_NEAP,hint:'Think about the shape the three objects make. Is it a line or an L?'},
+  m4e:{step:'m4',fig:{type:'daily'},fixed:true,text:'Scenario 5: It is high tide at the beach where the student stands. About how long until the next low tide, as Earth keeps turning?',opts:['About 1 hour','About 6 hours','About 12 hours','About 24 hours'],ans:1,
+    why:'High and low tides alternate about every 6 hours (about 6 hours 12 minutes). Earth turns a quarter of the way between a bulge and a flat spot.',hint:'There are two high tides and two low tides in about 24 hours. How are they spaced?'},
+
+  ex1:{step:'check',text:'What is the main cause of ocean tides?',opts:['The gravitational pull of the Moon and Sun','Wind blowing across the ocean','Earth’s tilt on its axis','Ocean currents like the Gulf Stream'],ans:0,
+    why:'Tides come from gravity. Wind makes waves, and tilt makes seasons.',hint:'Think about what your models used to make the bulges.'},
+  ex2:{step:'check',text:'The Sun is much bigger than the Moon. Why does the Moon have a bigger effect on tides?',opts:['The Moon is much closer to Earth.','The Moon is brighter at night.','The Moon is made of heavier material than Earth.','The Sun’s gravity does not reach Earth.'],ans:0,
+    why:'Gravity gets weaker with distance. The Moon is so much closer that its tide-making pull is bigger than the Sun’s, even though the Sun is much larger.',hint:'Look at the length of the Sun’s and Moon’s pull arrows in Mission 2.'},
+  ex3:{step:'check',text:'Which statement correctly compares tides and waves?',opts:['Tides are caused by gravity and rise and fall about every 12 hours. Waves are caused mostly by wind.','Tides are caused by wind. Waves are caused by the Moon.','Tides and waves are the same thing.','Waves are caused by gravity. Tides are caused by Earth’s tilt.'],ans:0,
+    why:'A beach still has tides on a calm day with no waves, because tides come from gravity.',hint:'Which one needs the Moon and Sun, and which one needs wind?'},
+  ex4:{step:'check',text:'Which statement about neap tides is correct?',opts:['They happen at first and third quarter moon and have the smallest tidal range.','They happen at new and full moon and have the biggest tidal range.','They happen at first and third quarter moon and have the biggest tidal range.','They happen at new and full moon and have the smallest tidal range.'],ans:0,
+    why:'Neap tides happen when the Moon makes a right angle with the Sun and Earth. The tidal range is at its smallest.',hint:'Check your Mission 2 table. Which Moon positions had the smallest range?'},
+  ex5:{step:'check',text:'A fishing guide reads a tide table. This week has the smallest tidal range of the month. Which Moon phase is most likely?',opts:['First quarter or third quarter','New moon','Full moon','New moon and full moon'],ans:0,
+    why:'The smallest range is a neap tide, which happens at first or third quarter.',hint:'Smallest range means neap. When do neap tides happen?'},
+  ex6:{step:'check',text:'Most coastlines have two high tides and two low tides each day. Why?',opts:['Earth rotates through two tidal bulges, one facing the Moon and one on the opposite side.','The Moon orbits Earth twice a day.','The Sun and Moon take turns making tides.','Waves come in twice a day.'],ans:0,
+    why:'There is a bulge on the side facing the Moon and another on the far side. Earth’s rotation carries each coast through both.',hint:'Think about Mission 1. How many bulges were there?'}
+};
+
+function qList(step){return Object.keys(Q).filter(function(k){return Q[k].step===step;});}
+function qState(id){if(!S.qs[id])S.qs[id]={sel:null,tries:0,done:false,correct:false,first:false,wrongs:[],fb:'',fbc:''};
+  var st=S.qs[id];if(!st.order&&Q[id].opts){var idx=Q[id].opts.map(function(_,i){return i;});st.order=Q[id].fixed?idx:shuffle(idx);}return st;}
+function qDone(id){return !!(S.qs[id]&&S.qs[id].done);}
+
+/* ---------- model for chart ---------- */
+var T_M=12.4206,T_S=12;
+function tideH(t){return 5+2.0*Math.cos(2*Math.PI*t/T_M)+0.92*Math.cos(2*Math.PI*t/T_S);}
+function maxIn(a,b){var m=-1e9;for(var t=a;t<=b;t+=0.25){m=Math.max(m,tideH(t));}return m;}
+function chartExp(){return {e1:maxIn(0,24),e2:maxIn(168,192)};}
+
+/* ---------- figures ---------- */
+function triSVG(delta,label){
+  var W=380,H=240,cx=210,cy=118,R=78,sx=46,sy=118;
+  var phi=rad(180+delta);var mx=cx+R*Math.cos(phi),my=cy-R*Math.sin(phi);
+  var ly=my<=cy?my-20:my+30;
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(label)+' Sun on the left, Earth in the middle, Moon on its orbit.">'+
+   '<rect width="'+W+'" height="'+H+'" rx="12" fill="'+C.space+'"/>'+stars(18,W,H,delta+3)+
+   '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+C.line+'" stroke-dasharray="3 5" opacity=".5"/>'+
+   '<line x1="'+(sx+26)+'" y1="'+sy+'" x2="'+(cx-22)+'" y2="'+cy+'" stroke="'+C.sun+'" stroke-dasharray="5 5" opacity=".7"/>'+
+   '<line x1="'+cx+'" y1="'+cy+'" x2="'+mx.toFixed(1)+'" y2="'+my.toFixed(1)+'" stroke="'+C.moon+'" stroke-dasharray="5 5" opacity=".7"/>'+
+   '<circle cx="'+sx+'" cy="'+sy+'" r="26" fill="'+C.sun+'"/>'+
+   '<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="'+C.sea+'"/><g transform="translate('+cx+' '+cy+') scale(.31)" fill="'+C.land2+'">'+BLOBS+'</g>'+
+   moonG(mx,my,11,sx,sy)+
+   '<g font-size="13" fill="'+C.ink+'" text-anchor="middle" font-family="Lexend,system-ui,sans-serif"><text x="'+sx+'" y="'+(sy+46)+'">Sun</text><text x="'+cx+'" y="'+(cy+40)+'">Earth</text><text x="'+mx.toFixed(1)+'" y="'+ly.toFixed(1)+'">Moon</text></g></svg>';
+}
+function dailySVG(){
+  return '<svg viewBox="0 0 380 220" role="img" aria-label="Earth seen from above its north pole. Ocean bulges toward the Moon on the right and on the opposite side. A student stands at the bulge facing the Moon.">'+
+   '<rect width="380" height="220" rx="12" fill="'+C.space+'"/>'+stars(16,380,220,11)+
+   '<ellipse cx="150" cy="110" rx="64" ry="50" fill="'+C.sea+'" opacity=".9"/>'+
+   '<circle cx="150" cy="110" r="42" fill="'+C.land+'"/><g transform="translate(150 110) scale(.6)" fill="'+C.land2+'">'+BLOBS+'</g>'+
+   '<circle cx="192" cy="110" r="6" fill="'+C.pin+'" stroke="#000" stroke-opacity=".4"/>'+
+   '<circle cx="330" cy="110" r="16" fill="'+C.moon+'"/>'+
+   '<g font-size="13" fill="'+C.ink+'" text-anchor="middle" font-family="Lexend,system-ui,sans-serif"><text x="226" y="106" fill="'+C.pin+'">You</text><text x="330" y="146">Moon</text><text x="150" y="190">Earth turns this way ↺</text></g></svg>';
+}
+function figHTML(f){return '<div class="fig">'+(f.type==='tri'?triSVG(f.delta,f.label):dailySVG())+'</div>';}
+
+/* ---------- question rendering ---------- */
+function qNum(id){return qList(Q[id].step).indexOf(id)+1;}
+function qHTML(id){
+  var q=Q[id];
+  if(q.type==='chart')return chartQHTML(id);
+  var st=qState(id);
+  var opts=st.order.map(function(oi){
+    var cls='opt';
+    if(!q.pred){
+      if(st.done&&oi===q.ans)cls+=' right';
+      else if(st.done&&st.sel===oi)cls+=' wrong';
+      else if(st.wrongs&&st.wrongs.indexOf(oi)>-1)cls+=' miss';
+    }
+    var dis=(!q.pred&&(st.done||(st.wrongs&&st.wrongs.indexOf(oi)>-1)))?' disabled':'';
+    return '<label class="'+cls+'"><input type="radio" name="r-'+id+'" data-q="'+id+'" value="'+oi+'"'+(st.sel===oi?' checked':'')+dis+'><span>'+q.opts[oi]+'</span></label>';
+  }).join('');
+  var btn=(!q.pred&&!st.done)?'<button class="btn" type="button" data-act="check" data-q="'+id+'">Check answer</button>':'';
+  var tag=q.pred?'<span class="qn">?</span>':'<span class="qn">'+qNum(id)+'</span>';
+  return '<fieldset class="q" id="q-'+id+'"><legend>'+tag+q.text+'</legend>'+(q.fig?figHTML(q.fig):'')+'<div class="opts">'+opts+'</div>'+btn+
+    (q.pred?'<div class="fb info">This is a prediction. There is no wrong answer. You will test it in your models.</div>':'<div class="fb '+(st.fbc||'')+'" role="status">'+(st.fb||'')+'</div>')+'</fieldset>';
+}
+function chartQHTML(id){
+  var st=qState(id);
+  return '<fieldset class="q" id="q-'+id+'"><legend><span class="qn">'+qNum(id)+'</span>Use the scrub slider on the chart. What is the highest tide height you can find on each day? Answers within about half a unit are fine.</legend>'+
+   '<div class="numrow"><label>Day 0 highest: <input type="number" inputmode="decimal" step="0.1" min="0" max="10" id="n1" value="'+esc(S.m3.n1)+'"'+(st.done?' disabled':'')+'></label>'+
+   '<label>Day 7 highest: <input type="number" inputmode="decimal" step="0.1" min="0" max="10" id="n2" value="'+esc(S.m3.n2)+'"'+(st.done?' disabled':'')+'></label></div>'+
+   (st.done?'':'<button class="btn" type="button" data-act="checkn" data-q="'+id+'">Check answer</button>')+
+   '<div class="fb '+(st.fbc||'')+'" role="status">'+(st.fb||'')+'</div></fieldset>';
+}
+function updateQ(id){var el=document.getElementById('q-'+id);if(!el)return;var t=document.createElement('div');t.innerHTML=qHTML(id);el.replaceWith(t.firstChild);}
+function qsHTML(step){return qList(step).map(qHTML).join('');}
+
+function checkQ(id){
+  var q=Q[id],st=qState(id);
+  if(st.sel==null){st.fb='Pick an answer first.';st.fbc='info';updateQ(id);return;}
+  st.tries++;
+  if(st.sel===q.ans){st.done=true;st.correct=true;st.first=(st.tries===1);st.fb='<strong>Correct.</strong> '+q.why;st.fbc='good';}
+  else{
+    st.wrongs=(st.wrongs||[]).concat(st.sel);
+    if(st.tries>=2){st.done=true;st.correct=false;st.fb='<strong>Not quite.</strong> The best answer is: '+q.opts[q.ans]+' '+q.why;st.fbc='bad';}
+    else{st.fb='<strong>Not yet.</strong> '+(q.hint||'Look at your model again and try once more.');st.fbc='bad';st.sel=null;}
+  }
+  save();updateQ(id);updateNav();
+}
+function checkChart(id){
+  var st=qState(id),e=chartExp();
+  var v1=parseFloat($('#n1').value),v2=parseFloat($('#n2').value);
+  S.m3.n1=$('#n1').value;S.m3.n2=$('#n2').value;
+  if(isNaN(v1)||isNaN(v2)){st.fb='Type a number in both boxes.';st.fbc='info';save();updateQ(id);return;}
+  st.tries++;
+  var ok1=Math.abs(v1-e.e1)<=0.6,ok2=Math.abs(v2-e.e2)<=0.6;
+  if(ok1&&ok2){st.done=true;st.correct=true;st.first=(st.tries===1);st.fb='<strong>Correct.</strong> The highest tide on Day 0 is about '+e.e1.toFixed(1)+' and on Day 7 about '+e.e2.toFixed(1)+'. The Day 0 tide is higher because the Sun, Earth, and Moon are lined up.';st.fbc='good';}
+  else if(st.tries>=2){st.done=true;st.correct=false;st.fb='<strong>Not quite.</strong> The highest tide on Day 0 is about '+e.e1.toFixed(1)+' and on Day 7 about '+e.e2.toFixed(1)+'.';st.fbc='bad';}
+  else{st.fb='<strong>Not yet.</strong> '+(ok1?'Your Day 0 reading is close. ':ok2?'Your Day 7 reading is close. ':'')+'Drag the scrub slider across that whole day and watch the tide height readout. Look for the top of the peak.';st.fbc='bad';}
+  save();updateQ(id);updateNav();
+}
+
+/* ---------- gating ---------- */
+function m2Counts(){var sp=0,np=0;S.m2.rows.forEach(function(r){if(r.type==='spring'&&r.mine==='spring')sp++;if(r.type==='neap'&&r.mine==='neap')np++;});return {sp:sp,np:np};}
+function stepMissing(id){
+  var m=[];
+  if(id==='report')return m;
+  if(id==='start'&&S.name.trim().length<2)m.push('type your name');
+  var left=qList(id).filter(function(k){return !qDone(k);}).length;
+  if(left)m.push(left+' question'+(left>1?'s':'')+' to answer');
+  if(id==='m1'&&S.m1.rows.length<6)m.push('record '+(6-S.m1.rows.length)+' more reading'+(6-S.m1.rows.length>1?'s':''));
+  if(id==='m2'){var c=m2Counts();
+    if(S.m2.rows.length<4)m.push('record '+(4-S.m2.rows.length)+' more reading'+(4-S.m2.rows.length>1?'s':''));
+    if(!c.sp)m.push('correctly label a spring tide');
+    if(!c.np)m.push('correctly label a neap tide');}
+  if(id==='check'&&(S.cer||'').trim().length<60)m.push('write your explanation (at least a few sentences)');
+  return m;
+}
+function maxOpen(){for(var i=0;i<STEPS.length-1;i++){if(stepMissing(STEPS[i].id).length)return i;}return STEPS.length-1;}
+
+/* ---------- nav ---------- */
+var anim=null;
+function stopAnim(){if(anim){clearInterval(anim);anim=null;}}
+function buildSteps(){
+  var mo=maxOpen();
+  $('#steps').innerHTML=STEPS.map(function(s,i){
+    var done=i<STEPS.length-1&&stepMissing(s.id).length===0&&i<mo+1&&i<mo;
+    return '<button class="chip'+(done?' done':'')+'" type="button" data-go="'+i+'"'+(i===S.step?' aria-current="step"':'')+(i>mo?' disabled':'')+'>'+s.title+'<small>'+s.sub+'</small></button>';
+  }).join('');
+  var finished=0;for(var i=0;i<STEPS.length-1;i++){if(stepMissing(STEPS[i].id).length===0)finished++;}
+  $('#fill').style.width=Math.round(finished/(STEPS.length-1)*100)+'%';
+}
+function updateNav(){
+  var id=STEPS[S.step].id,miss=stepMissing(id);
+  $('#back').disabled=S.step===0;
+  var next=$('#next'),gate=$('#gate');
+  if(S.step===STEPS.length-1){next.style.visibility='hidden';gate.textContent='';gate.className='gatemsg';}
+  else{
+    next.style.visibility='visible';next.disabled=miss.length>0;
+    next.textContent=S.step===STEPS.length-2?'See my lab report':'Next';
+    if(miss.length){gate.textContent='To move on: '+miss.join(', ')+'.';gate.className='gatemsg';}
+    else{gate.textContent='Nice work. Ready for the next step.';gate.className='gatemsg ready';}
+  }
+  buildSteps();
+  var td=$('#todo');if(td)td.innerHTML=todoHTML(id);
+}
+function todoHTML(id){
+  var items=[];
+  if(id==='m1')items.push([S.m1.rows.length>=6,'Record 6 readings ('+Math.min(6,S.m1.rows.length)+' of 6)']);
+  if(id==='m2'){var c=m2Counts();items.push([S.m2.rows.length>=4,'Record 4 readings ('+Math.min(4,S.m2.rows.length)+' of 4)']);items.push([c.sp>0,'Correctly label a spring tide']);items.push([c.np>0,'Correctly label a neap tide']);}
+  return items.map(function(x){return '<li class="'+(x[0]?'ok':'')+'">'+x[1]+'</li>';}).join('');
+}
+function go(i){stopAnim();S.step=clamp(i,0,STEPS.length-1);save();render();}
+
+/* ---------- step content ---------- */
+function head(n,title,mins,goal){return '<div class="mhead"><h2>'+(n?'Mission '+n+': ':'')+title+'</h2><p class="goal">'+goal+'</p><p class="mins">About '+mins+' minutes</p></div>';}
+
+function startHTML(){
+  return '<div class="panel"><h2>Why do oceans rise and fall?</h2>'+
+  '<p class="goal">Stand on a beach for a few hours and the water slowly climbs the sand, then slides back out. This is not caused by wind or waves. In this virtual lab you will build models of the Sun, Earth, and Moon to figure out what makes the ocean move, and then you will use your models to predict tides.</p>'+
+  '<div class="std"><strong>TEKS 6.9B</strong><br>Describe and predict how the positions of the Earth, Sun, and Moon cause daily, spring, and neap cycles of ocean tides due to gravitational forces.</div>'+
+  '<h3 style="margin-top:14px">By the end you can</h3><ul><li>explain why most coasts have two high tides and two low tides a day</li><li>show what positions of the Sun, Earth, and Moon cause spring tides and neap tides</li><li>predict the next tide using a tide chart and Moon position</li></ul></div>'+
+  '<div class="panel"><h3>Word bank</h3><dl class="vocab">'+
+   '<dt>Tide</dt><dd>The regular rise and fall of the ocean’s surface.</dd>'+
+   '<dt>Gravity</dt><dd>A pull between objects. It is stronger when objects are bigger or closer.</dd>'+
+   '<dt>Tidal bulge</dt><dd>A raised area of ocean water. There are two of them on Earth at any moment.</dd>'+
+   '<dt>Tidal range</dt><dd>The difference between the high tide level and the low tide level.</dd>'+
+   '<dt>Spring tide</dt><dd>A tide with the biggest tidal range. It has nothing to do with the season.</dd>'+
+   '<dt>Neap tide</dt><dd>A tide with the smallest tidal range.</dd></dl>'+
+   '<p class="note" style="margin-top:14px">Real tides also depend on the shape of the coastline and the depth of the ocean, so a real beach can look a little different. Your models show the main pattern caused by the Sun and Moon.</p></div>'+
+  '<div class="panel"><h3>How this lab works</h3><ol class="how"><li>Mission 1 (12 min): spin Earth under the Moon and find the daily pattern.</li><li>Mission 2 (15 min): move the Moon around Earth and compare spring and neap tides.</li><li>Mission 3 (10 min): read a real-style tide chart and make predictions.</li><li>Mission 4 (10 min): predict tides for new situations.</li><li>Exit check (8 min): show what you know, then print or save your lab report.</li></ol>'+
+   '<p>You get two tries on each question. If you miss both, the answer and the reason are shown so you can learn from it. Do not refresh the page. Your work is saved in this browser tab.</p>'+
+   '<div class="nameit"><label>Your name <input type="text" id="nm" autocomplete="off" value="'+esc(S.name)+'"></label><label>Class period <input type="text" id="pd" style="min-width:90px;width:100px" value="'+esc(S.period)+'"></label></div></div>'+
+  '<div class="panel"><h3>Make a prediction first</h3>'+qsHTML('start')+'</div>';
+}
+
+function m1HTML(){
+  return head(1,'Daily tides',12,'Earth spins under the Moon. Figure out why a beach gets two high tides and two low tides in one day.')+
+  '<div class="two"><div><div class="sim" id="m1sim">'+m1SVG()+'</div>'+
+   '<div class="ctl"><label for="m1h">Time of day</label><input id="m1h" type="range" min="0" max="24" step="0.25" value="'+S.m1.hour+'"><output id="m1t" for="m1h"></output></div>'+
+   '<div class="ctl"><button class="btn" type="button" id="m1play">Play 24 hours</button><button class="btn alt" type="button" id="m1rec">Record reading</button><label class="chk"><input type="checkbox" id="m1arr"'+(S.m1.arrows?' checked':'')+'> Show gravity pulls</label></div>'+
+   '<div class="read"><div><span>Tide height at your beach</span><b id="m1v"></b></div><div><span>What the tide is doing</span><b id="m1s"></b></div></div></div>'+
+  '<div class="panel"><h3>What to do</h3><ol class="how"><li>Press Play and watch Earth spin for one day. The Moon stays put.</li><li>Drag the slider to different times. Press Record reading at 6 different times.</li><li>Turn on Show gravity pulls and compare the arrow lengths.</li><li>Answer the three questions below.</li></ol><ul class="todo" id="todo"></ul>'+
+   '<p class="note" style="margin-top:12px">You are looking down from above Earth’s North Pole. The blue shape is the ocean. The yellow dot is you at the beach.</p>'+
+   '<div id="m1tbl"></div><button class="btn alt" type="button" id="m1clear" style="margin-top:8px">Clear table</button></div></div>'+
+  '<div style="margin-top:6px">'+qsHTML('m1')+'</div>';
+}
+function m1SVG(){
+  var arr='';
+  [[280,64,'strongest',312],[210,46,'medium',233],[140,30,'weakest',155]].forEach(function(a){
+    arr+='<line x1="'+a[0]+'" y1="200" x2="'+(a[0]+a[1])+'" y2="200" stroke="#fff" stroke-width="4" marker-end="url(#ah1)"/><text x="'+a[3]+'" y="222" text-anchor="middle" font-size="12" fill="#fff" stroke="#0B2233" stroke-width="3" paint-order="stroke">'+a[2]+'</text>';
+  });
+  var ticks='';for(var v=0;v<=10;v+=2){ticks+='<line x1="548" x2="556" y1="'+(310-22*v)+'" y2="'+(310-22*v)+'" stroke="'+C.line+'"/><text x="544" y="'+(314-22*v)+'" text-anchor="end" font-size="11" fill="'+C.ink+'">'+v+'</text>';}
+  return '<svg viewBox="0 0 640 400" role="img" aria-label="Top-down view of Earth with an ocean bulge toward the Moon and on the opposite side, and a tide gauge for the beach where you stand.">'+
+   '<defs><marker id="ah1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="#fff"/></marker><clipPath id="gc"><rect x="556" y="90" width="48" height="220" rx="6"/></clipPath></defs>'+
+   '<rect width="640" height="400" rx="14" fill="'+C.space+'"/>'+stars(40,640,400,7)+
+   '<ellipse cx="210" cy="200" rx="98" ry="80" fill="'+C.sea+'" opacity=".92"/>'+
+   '<g id="m1e"><g transform="translate(210 200)"><circle r="70" fill="'+C.land+'"/><g fill="'+C.land2+'">'+BLOBS+'</g><circle cy="-70" r="8" fill="'+C.pin+'" stroke="#000" stroke-opacity=".45"/></g></g>'+
+   '<text id="m1you" font-size="14" font-weight="600" fill="'+C.pin+'" text-anchor="middle" stroke="#0B2233" stroke-width="3" paint-order="stroke">You</text>'+
+   '<circle cx="470" cy="200" r="22" fill="'+C.moon+'"/><circle cx="461" cy="192" r="5" fill="#CFC79A"/><circle cx="478" cy="208" r="4" fill="#CFC79A"/><circle cx="476" cy="190" r="3" fill="#CFC79A"/>'+
+   '<text x="470" y="240" text-anchor="middle" font-size="14" fill="'+C.ink+'">Moon</text>'+
+   '<g id="m1arrows" style="display:none">'+arr+'</g>'+
+   '<text x="210" y="320" text-anchor="middle" font-size="13" fill="'+C.ink+'" opacity=".9">Earth turns this way ↺</text>'+
+   '<rect x="556" y="90" width="48" height="220" rx="6" fill="#06151F" stroke="#5E8294"/>'+
+   '<rect id="m1g" x="556" y="244" width="48" height="66" fill="'+C.sea+'" clip-path="url(#gc)"/>'+ticks+
+   '<text x="580" y="74" text-anchor="middle" font-size="13" fill="'+C.ink+'">Tide gauge</text></svg>';
+}
+function lvlInfo(h){
+  var th=90+15*h,lvl=5+2*Math.cos(rad(2*th)),nx=5+2*Math.cos(rad(2*(th+3.75)));
+  var st=lvl>=6.7?'High tide':lvl<=3.3?'Low tide':(nx>lvl?'Rising (coming in)':'Falling (going out)');
+  return {lvl:lvl,st:st};
+}
+function m1Table(){
+  var rows=S.m1.rows.slice().sort(function(a,b){return a.h-b.h;});
+  if(!rows.length)return '<p class="empty">No readings yet. Move the slider, then press Record reading.</p>';
+  return '<table class="data"><caption class="empty" style="text-align:left">Your readings</caption><thead><tr><th>Time</th><th>Height</th><th>Tide is…</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>'+fmtTime(r.h)+(r.h===24?' (next day)':'')+'</td><td>'+r.lvl.toFixed(1)+'</td><td>'+r.st+'</td></tr>';}).join('')+'</tbody></table>';
+}
+function drawM1(){
+  var h=S.m1.hour,th=90+15*h,info=lvlInfo(h);
+  $('#m1e').setAttribute('transform','rotate('+(-15*h)+' 210 200)');
+  var you=$('#m1you');you.setAttribute('x',(210+108*Math.cos(rad(th))).toFixed(1));you.setAttribute('y',(204-108*Math.sin(rad(th))).toFixed(1));
+  var y=310-22*info.lvl;$('#m1g').setAttribute('y',y.toFixed(1));$('#m1g').setAttribute('height',(310-y).toFixed(1));
+  $('#m1t').textContent=fmtTime(h)+(h===24?' (next day)':'');
+  $('#m1v').textContent=info.lvl.toFixed(1);$('#m1s').textContent=info.st;
+  $('#m1arrows').style.display=S.m1.arrows?'block':'none';
+}
+function bindM1(){
+  var sl=$('#m1h'),play=$('#m1play');
+  sl.addEventListener('input',function(){S.m1.hour=+sl.value;drawM1();save();});
+  $('#m1arr').addEventListener('change',function(e){S.m1.arrows=e.target.checked;drawM1();save();});
+  play.addEventListener('click',function(){
+    if(anim){stopAnim();play.textContent='Play 24 hours';return;}
+    if(S.m1.hour>=24)S.m1.hour=0;
+    play.textContent='Pause';
+    anim=setInterval(function(){S.m1.hour=Math.min(24,S.m1.hour+0.25);sl.value=S.m1.hour;drawM1();
+      if(S.m1.hour>=24){stopAnim();play.textContent='Play 24 hours';save();}},60);
+  });
+  $('#m1rec').addEventListener('click',function(){
+    var h=S.m1.hour,i=lvlInfo(h);
+    S.m1.rows=S.m1.rows.filter(function(r){return Math.abs(r.h-h)>0.01;});
+    S.m1.rows.push({h:h,lvl:i.lvl,st:i.st});
+    $('#m1tbl').innerHTML=m1Table();updateNav();save();
+  });
+  $('#m1clear').addEventListener('click',function(){S.m1.rows=[];$('#m1tbl').innerHTML=m1Table();updateNav();save();});
+  $('#m1tbl').innerHTML=m1Table();drawM1();
+}
+
+/* ---- Mission 2 ---- */
+var M2={cx:350,cy:210,R:130};
+function phaseName(d){
+  if(d<1.85||d>=27.68)return 'New moon';if(d<5.54)return 'Waxing crescent';if(d<9.23)return 'First quarter';if(d<12.92)return 'Waxing gibbous';
+  if(d<16.61)return 'Full moon';if(d<20.3)return 'Waning gibbous';if(d<23.99)return 'Third quarter';return 'Waning crescent';
+}
+function m2Calc(d){
+  var delta=d/29.53*360,phim=180+delta,re=Math.cos(rad(2*phim))+0.46*Math.cos(rad(360)),im=Math.sin(rad(2*phim))+0.46*Math.sin(rad(360));
+  var A=Math.hypot(re,im),psi=0.5*deg(Math.atan2(im,re));
+  var m=((delta%180)+180)%180,dl=Math.min(m,180-m),dr=Math.abs(m-90);
+  var shape=dl<=22?'Straight line':dr<=22?'Right angle':'In between';
+  var type=dl<=22?'spring':dr<=22?'neap':'between';
+  return {delta:delta,phim:phim,A:A,psi:psi,shape:shape,type:type,range:4*A,hi:5+2*A,lo:5-2*A,phase:phaseName(d)};
+}
+function m2HTML(){
+  return head(2,'Spring and neap tides',15,'Move the Moon around Earth. Find out how the positions of the Sun, Earth, and Moon change the size of the tides.')+
+  '<div class="two"><div><div class="sim">'+m2SVG()+'</div>'+
+   '<div class="ctl"><label for="m2d">Day of the Moon’s cycle</label><input id="m2d" type="range" min="0" max="29.5" step="0.1" value="'+S.m2.day+'"><output id="m2dt" for="m2d"></output></div>'+
+   '<div class="jump" aria-label="Jump to a Moon position"><button class="btn alt" type="button" data-day="0">New moon</button><button class="btn alt" type="button" data-day="7.4">First quarter</button><button class="btn alt" type="button" data-day="14.8">Full moon</button><button class="btn alt" type="button" data-day="22.1">Third quarter</button></div>'+
+   '<div class="ctl"><button class="btn" type="button" id="m2play">Play one cycle</button><label class="chk"><input type="checkbox" id="m2pull"'+(S.m2.pulls?' checked':'')+'> Show pulls</label></div>'+
+   '<div class="read"><div><span>Moon phase</span><b id="m2ph"></b></div><div><span>Shape the Sun, Earth, and Moon make</span><b id="m2sh"></b></div><div><span>High tide level</span><b id="m2hi"></b></div><div><span>Low tide level</span><b id="m2lo"></b></div><div><span>Tidal range (high minus low)</span><b id="m2rg"></b></div></div></div>'+
+  '<div class="panel"><h3>What to do</h3><ol class="how"><li>Press Play and watch the blue ocean change shape as the Moon orbits.</li><li>Stop at different Moon positions. Look at the tidal range.</li><li>Pick a name for the tide (spring, neap, or neither) using what you know from the word bank. Then press Record reading.</li><li>Record at least 4 readings, with one spring tide and one neap tide.</li></ol><ul class="todo" id="todo"></ul>'+
+   '<fieldset style="border:0;padding:0;margin:12px 0 0"><legend style="font-weight:600;padding:0">Name this tide</legend><div class="ctl" style="margin-top:6px"><label class="chk"><input type="radio" name="mine" value="spring"'+(S.m2.mine==='spring'?' checked':'')+'> Spring</label><label class="chk"><input type="radio" name="mine" value="neap"'+(S.m2.mine==='neap'?' checked':'')+'> Neap</label><label class="chk"><input type="radio" name="mine" value="between"'+(S.m2.mine==='between'?' checked':'')+'> Neither</label></div></fieldset>'+
+   '<div class="ctl"><button class="btn" type="button" id="m2rec">Record reading</button><button class="btn alt" type="button" id="m2clear">Clear table</button></div><div id="m2msg" class="fb" role="status"></div><div id="m2tbl"></div></div></div>'+
+  '<div style="margin-top:6px">'+qsHTML('m2')+'</div>';
+}
+function m2SVG(){
+  var cx=M2.cx,cy=M2.cy,R=M2.R,rays='';
+  for(var a=0;a<360;a+=30){rays+='<line x1="'+(62+44*Math.cos(rad(a))).toFixed(1)+'" y1="'+(210+44*Math.sin(rad(a))).toFixed(1)+'" x2="'+(62+56*Math.cos(rad(a))).toFixed(1)+'" y2="'+(210+56*Math.sin(rad(a))).toFixed(1)+'" stroke="'+C.sun+'" stroke-width="3" stroke-linecap="round"/>';}
+  return '<svg viewBox="0 0 640 420" role="img" aria-label="Model of the Sun on the left, Earth in the middle with an ocean that changes shape, and the Moon orbiting Earth.">'+
+   '<defs><marker id="amoon" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="'+C.moon+'"/></marker><marker id="asun" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="'+C.sun+'"/></marker></defs>'+
+   '<rect width="640" height="420" rx="14" fill="'+C.space+'"/>'+stars(45,640,420,13)+
+   '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+C.line+'" stroke-dasharray="3 6" opacity=".5"/>'+
+   rays+'<circle cx="62" cy="210" r="38" fill="'+C.sun+'"/>'+
+   '<text x="62" y="282" text-anchor="middle" font-size="14" fill="'+C.ink+'">Sun</text>'+
+   '<line x1="100" y1="210" x2="'+(cx-45)+'" y2="210" stroke="'+C.sun+'" stroke-dasharray="6 6" opacity=".6"/>'+
+   '<line id="m2ml" x1="'+cx+'" y1="'+cy+'" x2="'+(cx-R)+'" y2="'+cy+'" stroke="'+C.moon+'" stroke-dasharray="6 6" opacity=".6"/>'+
+   '<ellipse id="m2w" cx="'+cx+'" cy="'+cy+'" rx="70" ry="50" fill="'+C.sea+'" opacity=".92"/>'+
+   '<circle cx="'+cx+'" cy="'+cy+'" r="40" fill="'+C.land+'"/><g transform="translate('+cx+' '+cy+') scale(.57)" fill="'+C.land2+'">'+BLOBS+'</g>'+
+   '<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-size="13" fill="#fff" stroke="#0B2233" stroke-width="3" paint-order="stroke">Earth</text>'+
+   '<g id="m2pulls"><line id="m2pm" stroke="'+C.moon+'" stroke-width="4" marker-end="url(#amoon)"/><line id="m2ps" stroke="'+C.sun+'" stroke-width="4" marker-end="url(#asun)"/></g>'+
+   '<g id="m2moon"></g><text id="m2mt" text-anchor="middle" font-size="13" fill="'+C.ink+'">Moon</text>'+
+   '<text x="'+cx+'" y="404" text-anchor="middle" font-size="12" fill="'+C.ink+'" opacity=".85">Not to scale. Looking down from above Earth’s North Pole.</text></svg>';
+}
+function drawM2(){
+  var d=S.m2.day,m=m2Calc(d),cx=M2.cx,cy=M2.cy,R=M2.R;
+  var phi=rad(m.phim),mx=cx+R*Math.cos(phi),my=cy-R*Math.sin(phi);
+  $('#m2moon').innerHTML=moonG(mx,my,15,62,210);
+  var mt=$('#m2mt');mt.setAttribute('x',mx.toFixed(1));mt.setAttribute('y',(my<=cy?my-24:my+34).toFixed(1));
+  var ml=$('#m2ml');ml.setAttribute('x2',mx.toFixed(1));ml.setAttribute('y2',my.toFixed(1));
+  var b=30*m.A/1.46,w=$('#m2w');w.setAttribute('rx',(52+b).toFixed(1));w.setAttribute('ry',(52-0.15*b).toFixed(1));w.setAttribute('transform','rotate('+(-m.psi).toFixed(1)+' '+cx+' '+cy+')');
+  var pm=$('#m2pm'),ps=$('#m2ps');
+  pm.setAttribute('x1',(cx+44*Math.cos(phi)).toFixed(1));pm.setAttribute('y1',(cy-44*Math.sin(phi)).toFixed(1));pm.setAttribute('x2',(cx+88*Math.cos(phi)).toFixed(1));pm.setAttribute('y2',(cy-88*Math.sin(phi)).toFixed(1));
+  ps.setAttribute('x1',cx-44);ps.setAttribute('y1',cy);ps.setAttribute('x2',cx-44-20);ps.setAttribute('y2',cy);
+  $('#m2pulls').style.display=S.m2.pulls?'block':'none';
+  $('#m2dt').textContent='Day '+d.toFixed(1);
+  $('#m2ph').textContent=m.phase;$('#m2sh').textContent=m.shape;
+  $('#m2hi').textContent=m.hi.toFixed(1);$('#m2lo').textContent=m.lo.toFixed(1);$('#m2rg').textContent=m.range.toFixed(1);
+}
+function m2Table(){
+  var rows=S.m2.rows.slice().sort(function(a,b){return a.day-b.day;});
+  if(!rows.length)return '<p class="empty">No readings yet. Pick a tide name, then press Record reading.</p>';
+  return '<table class="data"><thead><tr><th>Day</th><th>Moon phase</th><th>Shape</th><th>Range</th><th>Your name</th><th></th></tr></thead><tbody>'+rows.map(function(r){
+    var nm=r.mine==='between'?'Neither':r.mine.charAt(0).toUpperCase()+r.mine.slice(1);
+    var ok=r.mine===r.type;
+    return '<tr><td>'+r.day.toFixed(1)+'</td><td>'+r.phase+'</td><td>'+r.shape+'</td><td>'+r.range.toFixed(1)+'</td><td>'+nm+'</td><td>'+(ok?'<span class="mark-ok">✓ matches</span>':'<span class="mark-no">Check the range</span>')+'</td></tr>';}).join('')+'</tbody></table>';
+}
+function bindM2(){
+  var sl=$('#m2d'),play=$('#m2play');
+  function setDay(v){S.m2.day=clamp(v,0,29.5);sl.value=S.m2.day;drawM2();save();}
+  sl.addEventListener('input',function(){S.m2.day=+sl.value;drawM2();save();});
+  document.querySelectorAll('[data-day]').forEach(function(b){b.addEventListener('click',function(){stopAnim();play.textContent='Play one cycle';setDay(+b.dataset.day);});});
+  $('#m2pull').addEventListener('change',function(e){S.m2.pulls=e.target.checked;drawM2();save();});
+  document.querySelectorAll('input[name=mine]').forEach(function(r){r.addEventListener('change',function(){S.m2.mine=r.value;save();});});
+  play.addEventListener('click',function(){
+    if(anim){stopAnim();play.textContent='Play one cycle';return;}
+    if(S.m2.day>=29.5)S.m2.day=0;
+    play.textContent='Pause';
+    anim=setInterval(function(){S.m2.day=Math.min(29.5,S.m2.day+0.2);sl.value=S.m2.day;drawM2();
+      if(S.m2.day>=29.5){stopAnim();play.textContent='Play one cycle';save();}},60);
+  });
+  $('#m2rec').addEventListener('click',function(){
+    var msg=$('#m2msg');
+    if(!S.m2.mine){msg.className='fb info';msg.textContent='Pick Spring, Neap, or Neither first.';return;}
+    msg.className='fb';msg.textContent='';
+    var d=Math.round(S.m2.day*10)/10,m=m2Calc(d);
+    S.m2.rows=S.m2.rows.filter(function(r){return Math.abs(r.day-d)>0.05;});
+    S.m2.rows.push({day:d,phase:m.phase,shape:m.shape,range:m.range,type:m.type,mine:S.m2.mine});
+    $('#m2tbl').innerHTML=m2Table();updateNav();save();
+  });
+  $('#m2clear').addEventListener('click',function(){S.m2.rows=[];$('#m2tbl').innerHTML=m2Table();updateNav();save();});
+  $('#m2tbl').innerHTML=m2Table();drawM2();
+}
+
+/* ---- Mission 3 ---- */
+var CH={W:760,H:350,L:56,Rr:740,T:20,B:260};
+function cx3(t){return CH.L+(CH.Rr-CH.L)*t/360;}
+function cy3(v){return CH.B-(CH.B-CH.T)*v/10;}
+function moonIcon(x,y,kind){
+  var r=10,base='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+C.moonDark+'" stroke="'+C.line+'"/>';
+  if(kind==='full')return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+C.moon+'" stroke="'+C.line+'"/>';
+  if(kind==='half')return base+'<path d="M'+x+' '+(y-r)+' A'+r+' '+r+' 0 0 1 '+x+' '+(y+r)+' Z" fill="'+C.moon+'"/>';
+  return base;
+}
+function chartSVG(){
+  var g='',i;
+  for(i=0;i<=10;i++){g+='<line x1="'+CH.L+'" x2="'+CH.Rr+'" y1="'+cy3(i)+'" y2="'+cy3(i)+'" style="stroke:var(--line)" stroke-width="'+(i%2?0.5:1)+'"/>';if(i%2===0)g+='<text x="'+(CH.L-8)+'" y="'+(cy3(i)+4)+'" text-anchor="end" font-size="12" style="fill:var(--muted)">'+i+'</text>';}
+  for(i=0;i<=15;i++){g+='<line x1="'+cx3(i*24)+'" x2="'+cx3(i*24)+'" y1="'+CH.T+'" y2="'+CH.B+'" style="stroke:var(--line)" stroke-width=".7"/><text x="'+cx3(i*24)+'" y="'+(CH.B+16)+'" text-anchor="middle" font-size="12" style="fill:var(--muted)">'+i+'</text>';}
+  var d='';for(var t=0;t<=360;t+=0.5){d+=(t===0?'M':'L')+cx3(t).toFixed(1)+' '+cy3(tideH(t)).toFixed(1);}
+  var mk=[[0,'New moon','dark'],[177,'First quarter','half'],[354,'Full moon','full']];
+  var icons=mk.map(function(m){var x=cx3(m[0]);var ax=m[0]===0?x+22:m[0]===354?x-26:x;return moonIcon(x,CH.B+42,m[2])+'<text x="'+ax+'" y="'+(CH.B+66)+'" text-anchor="middle" font-size="12" style="fill:var(--muted)">'+m[1]+'</text>';}).join('');
+  return '<svg id="m3svg" viewBox="0 0 '+CH.W+' '+CH.H+'" role="img" aria-label="Line chart of tide height over 15 days. Two peaks each day. The size of the peaks grows and shrinks over about two weeks." style="touch-action:pan-y">'+
+   g+'<path d="'+d+'" fill="none" stroke="#2B7FD1" stroke-width="2"/>'+
+   '<text transform="translate(14 '+((CH.T+CH.B)/2)+') rotate(-90)" text-anchor="middle" font-size="12" style="fill:var(--muted)">Tide height (model units)</text>'+
+   '<text x="'+CH.Rr+'" y="'+(CH.B+34)+'" text-anchor="end" font-size="12" style="fill:var(--muted)">Day number</text>'+
+   icons+
+   '<line id="m3cur" x1="'+CH.L+'" x2="'+CH.L+'" y1="'+CH.T+'" y2="'+CH.B+'" stroke="#E5772B" stroke-width="2"/><circle id="m3dot" r="5" fill="#E5772B" cx="'+CH.L+'" cy="'+cy3(5)+'"/></svg>';
+}
+function m3HTML(){
+  return head(3,'Read the tide chart',10,'Scientists use tide charts to predict tides. Read the chart, find the patterns, and make predictions.')+
+  '<div class="panel"><h3>Tide height at one beach for 15 days</h3><p class="mins" style="margin-bottom:6px">Day 0 starts at midnight. Move the scrub slider or tap the chart to read the tide height at any time.</p><div class="chart" id="m3chart">'+chartSVG()+'</div>'+
+   '<div class="ctl"><label for="m3t">Scrub</label><input id="m3t" type="range" min="0" max="360" step="0.5" value="'+S.m3.t+'"></div>'+
+   '<div class="read"><div><span>Time</span><b id="m3when"></b></div><div><span>Tide height</span><b id="m3h"></b></div></div></div>'+
+  qsHTML('m3');
+}
+function drawM3(){
+  var t=S.m3.t;$('#m3cur').setAttribute('x1',cx3(t));$('#m3cur').setAttribute('x2',cx3(t));
+  $('#m3dot').setAttribute('cx',cx3(t));$('#m3dot').setAttribute('cy',cy3(tideH(t)));
+  $('#m3when').textContent=dayTime(t);$('#m3h').textContent=tideH(t).toFixed(1);
+}
+function bindM3(){
+  var sl=$('#m3t'),svg=$('#m3svg'),down=false;
+  sl.addEventListener('input',function(){S.m3.t=+sl.value;drawM3();save();});
+  function fromPointer(e){var r=svg.getBoundingClientRect();var x=(e.clientX-r.left)/r.width*CH.W;var t=clamp((x-CH.L)/(CH.Rr-CH.L)*360,0,360);S.m3.t=Math.round(t*2)/2;sl.value=S.m3.t;drawM3();save();}
+  svg.addEventListener('pointerdown',function(e){down=true;fromPointer(e);});
+  svg.addEventListener('pointermove',function(e){if(down||e.pointerType==='mouse')fromPointer(e);});
+  window.addEventListener('pointerup',function(){down=false;});
+  drawM3();
+}
+
+/* ---- Mission 4 ---- */
+function m4HTML(){
+  return head(4,'Predict it',10,'Use what you learned to predict the tides in new situations. Think about the shape of the Sun, Earth, and Moon, and about how Earth spins.')+
+  '<div class="note" style="margin-bottom:14px">Each diagram shows the Sun on the left, Earth in the middle, and the Moon on its orbit. The pictures are not to scale.</div>'+qsHTML('m4');
+}
+
+/* ---- Exit check ---- */
+var CER_BOXES=['I made a clear claim.','I used evidence from my tables or the chart.','I explained using gravity and the positions of the Sun, Earth, and Moon.','I used the words gravity, Sun, Moon, Earth, and line.'];
+function checkHTML(){
+  return head(0,'Exit check',8,'Show what you know. Answer the six questions, then write a short explanation.').replace('Mission 0: ','')+qsHTML('check')+
+  '<div class="panel"><h3>Explain it</h3><p style="max-width:68ch">A friend says, “Spring tides only happen at full moon.” Is your friend correct? Write 3 to 5 sentences. Start with your claim, give evidence from your lab, and explain your reasoning. Use the words <em>gravity</em>, <em>Sun</em>, <em>Moon</em>, <em>Earth</em>, and <em>line</em>.</p>'+
+   '<textarea class="cer" id="cer" aria-label="Your explanation" placeholder="My friend is…">'+esc(S.cer)+'</textarea>'+
+   '<h3 style="margin-top:12px">Check your writing</h3>'+CER_BOXES.map(function(t,i){return '<label class="chk" style="margin:6px 0"><input type="checkbox" data-cer="'+i+'"'+(S.cerChecks[i]?' checked':'')+'> '+t+'</label>';}).join('')+'</div>';
+}
+
+/* ---- Report ---- */
+function resultOf(id){var st=S.qs[id];if(!st||!st.done)return 'Not answered';return st.correct?(st.first?'Correct on the first try':'Correct on the second try'):'Needed help (answer was shown)';}
+function reportData(){
+  var ids=Object.keys(Q).filter(function(k){return !Q[k].pred;});
+  var first=ids.filter(function(k){return S.qs[k]&&S.qs[k].first;}).length;
+  var corr=ids.filter(function(k){return S.qs[k]&&S.qs[k].correct;}).length;
+  return {ids:ids,first:first,corr:corr,total:ids.length};
+}
+function qLabel(id){var s={m1:'Mission 1',m2:'Mission 2',m3:'Mission 3',m4:'Mission 4',check:'Exit check'}[Q[id].step];return s+', question '+qNum(id);}
+function reportHTML(){
+  var R=reportData(),dt=new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  var p1=S.qs.pre1&&S.qs.pre1.sel!=null?Q.pre1.opts[S.qs.pre1.sel]:'No answer',p2=S.qs.pre2&&S.qs.pre2.sel!=null?Q.pre2.opts[S.qs.pre2.sel]:'No answer';
+  var rows=R.ids.map(function(id){return '<tr><td>'+qLabel(id)+'</td><td>'+resultOf(id)+'</td></tr>';}).join('');
+  return '<div class="report"><div class="panel"><h2>Tide Lab report</h2><p><strong>'+esc(S.name)+'</strong>'+(S.period?' · Period '+esc(S.period):'')+' · '+esc(dt)+'</p><p>TEKS 6.9B: daily, spring, and neap tides</p>'+
+   '<p><strong>Questions correct: '+R.corr+' of '+R.total+'</strong> ('+R.first+' on the first try)</p>'+
+   '<div class="rbtns"><button class="btn" type="button" data-act="print">Print or save as PDF</button><button class="btn alt" type="button" data-act="download">Download my report</button><button class="btn alt" type="button" data-act="copy">Copy my answers</button><span id="copied" class="mins" role="status"></span></div>'+
+   '<div class="rbtns note" style="align-items:center"><span>Sharing this computer? Save, print, or copy your report first. Then erase your work so the next student starts fresh.</span><button class="btn" type="button" id="clearall" data-act="clearall">Erase my work from this computer</button></div></div>'+
+  '<div class="panel"><h3>My predictions before the lab</h3><p>High tides in one day: '+esc(p1)+'</p><p>Main cause of tides: '+esc(p2)+'</p></div>'+
+  '<div class="panel"><h3>Mission 1 data: daily tides</h3>'+m1Table()+'</div>'+
+  '<div class="panel"><h3>Mission 2 data: spring and neap tides</h3>'+m2Table()+'</div>'+
+  '<div class="panel"><h3>Question results</h3><table class="data"><thead><tr><th>Question</th><th>Result</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+  '<div class="panel"><h3>My explanation</h3><p style="white-space:pre-wrap;max-width:70ch">'+esc(S.cer)+'</p></div></div>';
+}
+function reportText(){
+  var R=reportData(),L=[];
+  L.push('Tide Lab report (TEKS 6.9B)');L.push('Name: '+S.name+(S.period?'  Period: '+S.period:''));
+  L.push('Questions correct: '+R.corr+' of '+R.total+' ('+R.first+' on the first try)');L.push('');
+  L.push('Mission 1 readings:');S.m1.rows.slice().sort(function(a,b){return a.h-b.h;}).forEach(function(r){L.push('  '+fmtTime(r.h)+' | height '+r.lvl.toFixed(1)+' | '+r.st);});
+  L.push('');L.push('Mission 2 readings:');S.m2.rows.slice().sort(function(a,b){return a.day-b.day;}).forEach(function(r){L.push('  Day '+r.day.toFixed(1)+' | '+r.phase+' | '+r.shape+' | range '+r.range.toFixed(1)+' | I called it: '+r.mine);});
+  L.push('');L.push('Question results:');R.ids.forEach(function(id){L.push('  '+qLabel(id)+': '+resultOf(id));});
+  L.push('');L.push('My explanation:');L.push(S.cer);return L.join('\n');
+}
+
+function saveReport(){
+  var txt=reportText(),name='tide-lab-report-'+(S.name.trim().replace(/[^A-Za-z0-9]+/g,'-')||'student')+'.txt';
+  var done=function(s){var c=$('#copied');if(c)c.textContent=s;};
+  var fallback=function(){try{var b=new Blob([txt],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},1000);done('Saved. Check your Downloads folder.');}catch(err){done('Download did not work. Use Copy or Print instead.');}};
+  if(window.claude&&window.claude.use){
+    window.claude.use('downloads').then(function(dl){
+      if(!dl){fallback();return;}
+      dl.save({filename:name,data:txt}).then(function(){done('Saved. Check your Downloads folder.');},function(err){done(err&&err.code==='declined'?'Download canceled.':'Download did not work. Use Copy or Print instead.');});
+    },function(){fallback();});
+  }else fallback();
+}
+
+/* ---------- render engine ---------- */
+function stepHTML(id){
+  return {start:startHTML,m1:m1HTML,m2:m2HTML,m3:m3HTML,m4:m4HTML,check:checkHTML,report:reportHTML}[id]();
+}
+function bindStep(id){
+  if(id==='m1')bindM1();
+  if(id==='m2')bindM2();
+  if(id==='m3')bindM3();
+  if(id==='start'){
+    $('#nm').addEventListener('input',function(e){S.name=e.target.value;save();updateNav();});
+    $('#pd').addEventListener('input',function(e){S.period=e.target.value;save();});
+  }
+  if(id==='check'){
+    $('#cer').addEventListener('input',function(e){S.cer=e.target.value;save();updateNav();});
+    document.querySelectorAll('[data-cer]').forEach(function(c){c.addEventListener('change',function(){S.cerChecks[+c.dataset.cer]=c.checked;save();});});
+  }
+}
+function render(){
+  var id=STEPS[S.step].id;
+  $('#stage').innerHTML=stepHTML(id);
+  bindStep(id);updateNav();
+  window.scrollTo(0,0);
+}
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-act],[data-go]');if(!t)return;
+  if(t.dataset.go!==undefined){go(+t.dataset.go);return;}
+  var a=t.dataset.act;
+  if(a==='check')checkQ(t.dataset.q);
+  if(a==='checkn')checkChart(t.dataset.q);
+  if(a==='print')window.print();
+  if(a==='download')saveReport();
+  if(a==='clearall'){
+    if(!t.dataset.armed){t.dataset.armed='1';t.textContent='Press again to erase everything';setTimeout(function(){if(t.isConnected){delete t.dataset.armed;t.textContent='Erase my work from this computer';}},5000);return;}
+    stopAnim();S=freshState();save();try{sessionStorage.removeItem('tidelab-6-9b');}catch(err){}render();
+    var st=$('#stage');var n=document.createElement('div');n.className='fb good';n.setAttribute('role','status');n.textContent='Your work was erased from this computer. The next student can begin.';st.insertBefore(n,st.firstChild);}
+  if(a==='copy'){var txt=reportText(),msg=function(s){var c=$('#copied');if(c)c.textContent=s;};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){msg('Copied. Paste it into your assignment.');},function(){msg('Copy did not work. Use Print or save as PDF instead.');});}
+    else msg('Copy did not work. Use Print or save as PDF instead.');}
+});
+document.addEventListener('change',function(e){
+  var r=e.target;
+  if(r.matches&&r.matches('input[type=radio][data-q]')){
+    var id=r.dataset.q,st=qState(id);st.sel=+r.value;
+    if(Q[id].pred){st.done=true;st.correct=false;}
+    save();updateNav();
+  }
+});
+$('#back').addEventListener('click',function(){go(S.step-1);});
+$('#next').addEventListener('click',function(){go(S.step+1);});
+var rs=$('#reset'),rsArmed=false;
+rs.addEventListener('click',function(){
+  if(!rsArmed){rsArmed=true;rs.textContent='Press again to erase all work';setTimeout(function(){rsArmed=false;rs.textContent='Start over';},4000);return;}
+  stopAnim();S=freshState();save();rsArmed=false;rs.textContent='Start over';render();
+});
+
+if(loaded&&S.step>maxOpen())S.step=maxOpen();
+render();
+})();
+</script>
+</body>
+</html>
